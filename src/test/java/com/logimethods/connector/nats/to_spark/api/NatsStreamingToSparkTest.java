@@ -86,7 +86,8 @@ public class NatsStreamingToSparkTest extends AbstractNatsToSparkTest {
 		validateTheReceptionOfMessages(ssc, messages);
 	}
 
-	@Test(timeout = 80000, invocationCount = 100)
+	@Test(timeout = 80000)
+	@RepeatedTest(100)
 	public void testNatsToKeyValueSparkConnectorWithAdditionalSubjects() throws InterruptedException {
 
 		JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(200));

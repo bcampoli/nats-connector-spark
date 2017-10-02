@@ -41,7 +41,7 @@ jobs:
       inputs:
       - name: github-repo-master
       run:
-        path: github-repo-master/scripts/test.sh
+        path: ./github-repo-master/scripts/test.sh
     on_failure:
       put: slack-alert
       params:
@@ -77,7 +77,7 @@ jobs:
       inputs:
       - name: github-repo-master
       run:
-        path: github-repo-master/scripts/deploy-release.sh
+        path: ./github-repo-master/scripts/deploy-release.sh
     on_failure:
       put: slack-alert
       params:
@@ -117,7 +117,7 @@ jobs:
       outputs:
       - name: github-docs-updated
       run:
-        path: github-repo-master/scripts/javadocs.sh
+        path: ./github-repo-master/scripts/javadocs.sh
   - put: gh-pages
     params: {repository: github-docs-updated}
     on_failure:

@@ -1,0 +1,136 @@
+
+resource_types:
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+    tag: latest
+
+resources:
+- name: github-repo-master
+  type: git
+  source:
+    uri: https://((github-username)):((github-password))@github.com/((github-repo-location))/((github-repo-name)).git
+    branch: master
+
+- name: gh-pages
+  type: git
+  source:
+    uri: https://((github-username)):((github-password))@github.com/((github-repo-location))/((github-repo-name)).git
+    branch: gh-pages
+
+- name: slack-alert
+  type: slack-notification
+  source:
+    url: ((slack-webhook))
+
+jobs:
+
+- name: run-tests
+  plan:
+  - get: github-repo-master
+    trigger: true
+  - task: run-test
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: hseeberger/scala-sbt
+          tag: "latest"
+      inputs:
+      - name: github-repo-master
+      run:
+        path: github-repo-master/scripts/test.sh
+    on_failure:
+      put: slack-alert
+      params:
+        channel: '#deetazilla'
+        text: ((project-name)) Build Tests Failed!
+        username: concourse
+        icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+    on_success:
+      put: slack-alert
+      params:
+        channel: '#deetazilla'
+        text:  ((project-name)) Build Tests Passed Succesfully!
+        username: concourse
+        icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+
+
+
+- name: sonatype-deploy
+  plan:
+  - get: github-repo-master
+    passed: [run-tests]
+    trigger: true
+  - task: release-deploy
+    params:
+      SONATYPE_PGP_KEYS_64: ((sonatype-pgp-keys-64))
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: hseeberger/scala-sbt
+          tag: "latest"
+      inputs:
+      - name: github-repo-master
+      run:
+        path: github-repo-master/scripts/deploy-release.sh
+    on_failure:
+      put: slack-alert
+      params:
+        channel: '#deetazilla'
+        text: ((project-name)) failed to deploy release to Nexus!
+        username: concourse
+        icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+    on_success:
+      put: slack-alert
+      params:
+        channel: '#deetazilla'
+        text: ((project-name)) Release deployed to Nexus!
+        username: concourse
+        icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+
+
+- name: javadocs
+  plan:
+  - get: github-repo-master
+    passed: [sonatype-deploy]
+    trigger: true
+  - get: gh-pages
+  - task: update-docs
+    params:
+      GITHUB_EMAIL: ((github-email))
+      GITHUB_USERNAME: ((github-username))
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: hseeberger/scala-sbt
+          tag: "latest"
+      inputs:
+      - name: github-repo-master
+      - name: gh-pages
+      outputs:
+      - name: github-docs-updated
+      run:
+        path: github-repo-master/scripts/javadocs.sh
+  - put: gh-pages
+    params: {repository: github-docs-updated}
+    on_failure:
+      put: slack-alert
+      params:
+        channel: '#deetazilla'
+        text: ((project-name)) Docs Failed to Update!
+        username: concourse
+        icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+    on_success:
+      put: slack-alert
+      params:
+        channel: '#deetazilla'
+        text: ((project-name)) Docs Succesfully Updated!
+        username: concourse
+        icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png

@@ -1,3 +1,4 @@
+#!/bin/sh
 git config --global user.email "$GITHUB_EMAIL"
 git config --global user.name "$GITHUB_USERNAME"
 

@@ -46,7 +46,7 @@ public class NatsStreamingToSparkTest extends AbstractNatsToSparkTest {
 	protected final static String CLIENT_ID = "CLIENT_ID";
 	private static final int STANServerPORT = 4223;
 	private static final String STAN_URL = "nats://localhost:" + STANServerPORT;
-	
+
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -57,26 +57,26 @@ public class NatsStreamingToSparkTest extends AbstractNatsToSparkTest {
 		UnitTestUtilities.setLogLevel(NatsPublisher.class, level);
 		UnitTestUtilities.setLogLevel(NatsStreamingPublisher.class, level);
 		UnitTestUtilities.setLogLevel(SparkToNatsConnector.class, level);
-		UnitTestUtilities.setLogLevel(NatsStreamingToSparkConnectorImpl.class, level);		
-		UnitTestUtilities.setLogLevel(NatsStreamingToSparkTest.class, level);		
+		UnitTestUtilities.setLogLevel(NatsStreamingToSparkConnectorImpl.class, level);
+		UnitTestUtilities.setLogLevel(NatsStreamingToSparkTest.class, level);
 		UnitTestUtilities.setLogLevel(TestClient.class, level);
 		UnitTestUtilities.setLogLevel("org.apache.spark", level);
 		UnitTestUtilities.setLogLevel("org.spark-project", level);
 
-		logger = LoggerFactory.getLogger(SparkToNatsStreamingConnectorPoolTest.class);       
+		logger = LoggerFactory.getLogger(SparkToNatsStreamingConnectorPoolTest.class);
 	}
 
 	@Override
 	protected NatsPublisher getNatsPublisher(int nbOfMessages) {
 		return new NatsStreamingPublisher("np", CLUSTER_ID, getUniqueClientName(), STAN_URL, DEFAULT_SUBJECT,  nbOfMessages);
 	}
-	
+
 	@Test(timeout = 8000)
 	public void testNatsToSparkConnectorWithAdditionalSubjects() throws InterruptedException {
-		
+
 		JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(200));
 
-		final JavaReceiverInputDStream<String> messages = 
+		final JavaReceiverInputDStream<String> messages =
 				NatsToSparkConnector
 						.receiveFromNatsStreaming(String.class, StorageLevel.MEMORY_ONLY(), CLUSTER_ID)
 						.withNatsURL(STAN_URL)
@@ -85,13 +85,13 @@ public class NatsStreamingToSparkTest extends AbstractNatsToSparkTest {
 
 		validateTheReceptionOfMessages(ssc, messages);
 	}
-	
-	@Test(timeout = 8000)
+
+	@Test(timeout = 80000)
 	public void testNatsToKeyValueSparkConnectorWithAdditionalSubjects() throws InterruptedException {
-		
+
 		JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(200));
-		
-		final JavaPairDStream<String, String> messages = 
+
+		final JavaPairDStream<String, String> messages =
 				NatsToSparkConnector
 						.receiveFromNatsStreaming(String.class, StorageLevel.MEMORY_ONLY(), CLUSTER_ID)
 						.withNatsURL(STAN_URL)
@@ -104,7 +104,7 @@ public class NatsStreamingToSparkTest extends AbstractNatsToSparkTest {
     @Test(timeout = 5000)
     public void testBasicSubscription() {
         // Run a STAN server
-    	
+
         try (STANServer s = runServer(CLUSTER_ID, false)) {
             Options options = new Options.Builder().natsUrl(STAN_URL).build();
             try (StreamingConnection sc = NatsStreaming.connect(CLUSTER_ID, getUniqueClientName(), options)) {
@@ -136,8 +136,8 @@ public class NatsStreamingToSparkTest extends AbstractNatsToSparkTest {
         }
         return srv;
     }
-      
+
     static String getUniqueClientName() {
     	return CLIENT_ID + NatsSparkUtilities.generateUniqueID();
-    }    
+    }
 }

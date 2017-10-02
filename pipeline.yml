@@ -41,7 +41,7 @@ jobs:
       inputs:
       - name: github-repo-master
       run:
-        path: github-repo-master/test.sh
+        path: github-repo-master/scripts/test.sh
     on_failure:
       put: slack-alert
       params:

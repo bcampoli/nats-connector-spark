@@ -36,12 +36,12 @@ jobs:
       image_resource:
         type: docker-image
         source:
-          repository: hseeberger/scala-sbt
+          repository: maven
           tag: "latest"
       inputs:
       - name: github-repo-master
       run:
-        path: github-repo-master/scripts/test.sh
+        path: github-repo-masterk/scripts/test.sh
     on_failure:
       put: slack-alert
       params:
@@ -72,7 +72,7 @@ jobs:
       image_resource:
         type: docker-image
         source:
-          repository: hseeberger/scala-sbt
+          repository: maven
           tag: "latest"
       inputs:
       - name: github-repo-master
@@ -109,7 +109,7 @@ jobs:
       image_resource:
         type: docker-image
         source:
-          repository: hseeberger/scala-sbt
+          repository: maven
           tag: "latest"
       inputs:
       - name: github-repo-master

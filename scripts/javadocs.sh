@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 set -e -x
 
 git config --global user.email "$GITHUB_EMAIL"

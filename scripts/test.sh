@@ -3,4 +3,8 @@ set -e -x
 cd github-repo-master
 gnatsd -p 4221&
 nats-streaming-server -p 4223&
-mvn -Dtest=NatsStreamingToSparkTest#testNatsToKeyValueSparkConnectorWithAdditionalSubjects test
+
+for i in $(seq 0 100);
+  do
+    mvn -Dtest=NatsStreamingToSparkTest#testNatsToKeyValueSparkConnectorWithAdditionalSubjects test &
+done

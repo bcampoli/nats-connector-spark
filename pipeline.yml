@@ -107,7 +107,7 @@ jobs:
       image_resource:
         type: docker-image
         source:
-          repository: maven
+          repository: logimethods/maven-nats
       inputs:
       - name: github-repo-master
       - name: gh-pages

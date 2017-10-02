@@ -36,8 +36,7 @@ jobs:
       image_resource:
         type: docker-image
         source:
-          repository: maven
-          tag: "latest"
+          repository: logimethods/maven-nats
       inputs:
       - name: github-repo-master
       run:
@@ -72,8 +71,7 @@ jobs:
       image_resource:
         type: docker-image
         source:
-          repository: maven
-          tag: "latest"
+          repository: logimethods/maven-nats
       inputs:
       - name: github-repo-master
       run:
@@ -110,7 +108,6 @@ jobs:
         type: docker-image
         source:
           repository: maven
-          tag: "latest"
       inputs:
       - name: github-repo-master
       - name: gh-pages

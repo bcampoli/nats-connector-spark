@@ -36,12 +36,12 @@ jobs:
       image_resource:
         type: docker-image
         source:
-          repository: maven
+          repository: ubuntu
           tag: "latest"
       inputs:
       - name: github-repo-master
       run:
-        path: github-repo-masterk/scripts/test.sh
+        path: github-repo-master/test.sh
     on_failure:
       put: slack-alert
       params:

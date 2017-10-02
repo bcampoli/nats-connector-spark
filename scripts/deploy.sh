@@ -1,4 +1,6 @@
 #!/bin/sh
+
+set -e -x
 export ASC_DIRECTORY=$(pwd)/pgp
 mkdir pgp
 mkdir /root/.gnupg
